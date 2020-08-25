@@ -16,7 +16,7 @@
 # 5 - API Password String
 
 
-passLocation="/Library/Application Support/CMM/rescue"
+passLocation="/Library/Application Support/COMPANYNAME/rescue"
 #get the filepath
 pathLocation=$(dirname "$passLocation")
 #make sure the filepath exists
