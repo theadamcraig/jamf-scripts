@@ -1,0 +1,165 @@
+#! /bin/bash
+
+## written by theadamcraig and sourced from https://github.com/theadamcraig/jamf-scripts/
+
+# referenced this article for some of the commands
+# https://www.jamf.com/jamf-nation/discussions/26608/adding-user-to-filevault-using-fdesetup-and-recovery-key
+
+## I hardcoded the localAdminAccount into this script to make sure it never gets removed from filevault.
+## change the variable in line 20 of "localAdminAccount" to the name of your local admin
+
+# This was originally written with the expect command, but that broke when a user had a # in their password
+# I commented out that section, but it now uses a .plist to add the user to filevault
+
+# last updated 7/9/2020
+
+adminName=$4
+adminPass=$5
+
+enableFV2JamfTrigger="catalina_fv"
+localAdminAccount="localAdminAccount"
+ 
+loggedInUser=$( echo "show State:/Users/ConsoleUser" | scutil | awk '/Name :/ && ! /loginwindow/ { print $3 }' )
+
+if [[ -z "$loggedInUser" ]] || [[  "$loggedInUser" == 'root' ]] || [[ "$loggedInUser" == "loginwindow" ]] ; then
+	echo "Failed to gather loggedInUser correctly"
+	exit 1
+else
+	echo "loggedInUser is $loggedInUser"
+fi
+
+#### SET UP DISPLAY DIALOG FUNCTION
+DisplayDialog(){
+	local dialogText="$1"
+	echo "Display Dialog: $dialogText"
+	cmd="Tell app \"System Events\" to display dialog \"$dialogText\""
+	/usr/bin/osascript -e "$cmd"
+}
+
+## Check Filevault Status
+fvStatus=$(fdesetup status)
+if [[ "$fvStatus" == *"FileVault is On."* ]] ; then
+	Log "Verified Filevault Enabled"
+else
+	jamf policy -trigger $enableFV2JamfTrigger -forceNoRecon
+	sleep 5
+	DisplayDialog "Filevault Not Yet Enabled. Please Restart the computer to enable Filevault and Try again."
+	exit 1
+fi
+
+fileVaultUserCheck() {
+	userToCheck="$1"
+	# this checks to see if the user exists
+	userCheck=$(dscl . list /Users | grep "$userToCheck")
+	if [[ -z "$userCheck" ]] ; then
+		echo "$userToCheck does not exist"
+	else
+		fdeList=`fdesetup list | grep $userToCheck`
+		echo "checking Filevault list $fdeLIst for $userToCheck"
+		if [[ "$fdeList" == *"$userToCheck"* ]] ; then
+			echo "FV2 Check for $userToCheck passed. Continuing"
+		else
+			DisplayDialog="$userToCheck not Filevault Enabled. Rectify this BEFORE you restart!"
+		fi
+	fi
+}
+
+## IF run in localAdminAccount or rescue account then prompt for which user is being updated
+if [[ "$loggedInUser" == "rescue" ]] || [[ "$loggedInUser" == "$localAdminAccount" ]] || [[ "$loggedInUser" == "$adminName" ]] || [[ "$loggedInUser" == "setup" ]] ; then
+echo "prompting user for Account Password"
+loggedInUser=$(/usr/bin/osascript<<END
+tell application "System Events"
+activate
+set the answer to text returned of (display dialog "Enter the Account you want Update Filevault" default answer "" buttons {"Continue"} default button 1)
+end tell
+END
+)
+fi
+
+if [[ "$loggedInUser" == "$adminName" ]] || [[ "$loggedInUser" == "$localAdminAccount" ]] || [[ "$loggedInUser" == "rescue" ]]; then
+	echo "Admin user is logged in."
+	dialog="Do Not run this tool when logged in as $loggedInUser! Exiting!"
+	cmd="Tell app \"System Events\" to display dialog \"$dialog\""
+	/usr/bin/osascript -e "$cmd"
+	exit 1
+fi
+
+
+echo "prompting user for Account Password"
+userPass=$(/usr/bin/osascript<<END
+tell application "System Events"
+activate
+set the answer to text returned of (display dialog "Enter $loggedInUser's Current Account Password:" default answer "" with hidden answer buttons {"Continue"} default button 1)
+end tell
+END
+)
+
+dscacheutil -q user -a name "$loggedInUser"
+
+passCheck=$(/usr/bin/dscl /Local/Default -authonly "$loggedInUser" "$userPass")
+if [[ -z "$passCheck" ]]; then
+	echo "Continue"
+else
+	echo "Authorization failed"
+	DisplayDialog "Password Check for $loggedInUser failed. Cached AD password may need to be update first."
+	exit 1
+fi
+
+
+#IF IT GETS PASSED THIS WE HAVE CONFIRMED THE CORRECT USERNAME
+
+fdesetup remove -user $loggedInUser
+ 
+# expect -c "
+# spawn fdesetup add -usertoadd $loggedInUser
+# expect \"Enter the primary user name:\"
+# send ${adminName}\r
+# expect \"Enter the password for the user '$adminName':\"
+# send ${adminPass}\r
+# expect \"Enter the password for the added user '$loggedInUser':\"
+# send ${userPass}\r
+# expect" 
+
+## The above section errorred out due to special characters in a users password. 
+## found the below solution at: 
+## https://www.jamf.com/jamf-nation/discussions/20809/add-local-admin-to-filevault-via-script#responseChild125971
+
+# create the plist file:
+echo '<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+<key>Username</key>
+<string>'$adminName'</string>
+<key>Password</key>
+<string>'$adminPass'</string>
+<key>AdditionalUsers</key>
+<array>
+	<dict>
+		<key>Username</key>
+		<string>'$loggedInUser'</string>
+		<key>Password</key>
+		<string>'$userPass'</string>
+	</dict>
+</array>
+</dict>
+</plist>' > /tmp/fvenable.plist  ### you can place this file anywhere just adjust the fdesetup line below
+
+# now enable FileVault
+fdesetup add -i < /tmp/fvenable.plist
+
+rm -r /tmp/fvenable.plist
+
+## this verifies that the other accounts I put on the computer are still Filevault enabled.
+fileVaultUserCheck "$localAdminAccount"
+fileVaultUserCheck "rescue"
+
+fdeList=`fdesetup list | grep $loggedInUser`
+
+if [[ "$fdeList" == *"$loggedInUser"* ]] ; then
+	DisplayDialog "$loggedInUser Filevault password updated successfully"
+	exit 0
+else
+	DisplayDialog "Adding $loggedInUser to FV2 Failed. Run 'Update Filevault Password' in Self Service"
+	exit 1
+fi
