@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Based on a script that installs the latest version of chrome.
 
 loggedInUser=$( echo "show State:/Users/ConsoleUser" | scutil | awk '/Name :/ && ! /loginwindow/ { print $3 }' )
@@ -28,7 +28,7 @@ url='https://akamaicdn.webex.com/client/webexapp.dmg'
 /bin/echo "`date`: Installing..." >> ${logfile}
 
 ### run the installer as the user
-/bin/launchctl asuser "$loggedinUID" /usr/sbin/installer -pkg "/Volumes/${volname}/${installerName}" -target /
+/bin/launchctl asuser "$loggedInUID" /usr/sbin/installer -pkg "/Volumes/${volname}/${installerName}" -target /
 /bin/sleep 10
 /bin/echo "`date`: Unmounting installer disk image." >> ${logfile}
 /usr/bin/hdiutil detach $(/bin/df | /usr/bin/grep "${volname}" | awk '{print $1}') -quiet
