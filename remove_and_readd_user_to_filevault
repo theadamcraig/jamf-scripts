@@ -40,7 +40,7 @@ DisplayDialog(){
 ## Check Filevault Status
 fvStatus=$(fdesetup status)
 if [[ "$fvStatus" == *"FileVault is On."* ]] ; then
-	Log "Verified Filevault Enabled"
+	echo "Verified Filevault Enabled"
 else
 	jamf policy -trigger $enableFV2JamfTrigger -forceNoRecon
 	sleep 5
