@@ -18,7 +18,7 @@ adminName=$4
 adminPass=$5
 
 enableFV2JamfTrigger="catalina_fv"
-localAdminAccount="admin0417"
+localAdminAccount="LOCALADMINACCOUNTHERE"
  
 loggedInUser=$( echo "show State:/Users/ConsoleUser" | scutil | awk '/Name :/ && ! /loginwindow/ { print $3 }' )
 
