@@ -11,6 +11,7 @@
 # This was originally written with the expect command, but that broke when a user had a # in their password
 # I commented out that section, but it now uses a .plist to add the user to filevault
 
+# updated 1/20/2021 - fixed some secure token things
 # updated 10/30/2020 - added sections to make sure both users have a secure token and that the user being removed and re-added gets a new secure token.
 # updated 7/9/2020
 
@@ -66,8 +67,8 @@ addSecureToken() {
 	local addUserPass="$4"
 	echo "adding token to $addUser with credentials from $tokenUser"
 	sysadminctl -adminUser "$tokenUser" -adminPassword "$tokenUserPass" -secureTokenOn "$addUser" -password "$addUserPass"
-	tokenAdded=$(secureTokenUserCheck "$tokenUser")
-	echo "Token Added to $tokenUser : $tokenAdded"
+	tokenAdded=$(secureTokenUserCheck "$addUser")
+	echo "Token Added to $addUser : $tokenAdded"
 	diskutil apfs listcryptousers /
 }
 
