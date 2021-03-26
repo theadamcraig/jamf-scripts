@@ -1,9 +1,5 @@
 #!/bin/bash
 
-#################################################
-# LAPS for MAC
-#################################################
-
 ## based on script found at: AT https://github.com/therealmacjeezy/Scripts/blob/master/LAPS%20for%20Mac/LAPSforMac.sh
 
 ## CLEANUP!
@@ -84,10 +80,40 @@ if [[ "$checkPass" == "$getPass" ]] ; then
 else
 	echo "password failed to upload to jamf"
 	echo "trying again"
-	setEAStatus
+	alternateUploadCheck
 fi
 }
 
-setEAStatus
+
+alternateUploadCheck() {
+echo "Checking Password Differently due to intermittent errorerror"
+fullResult=$(curl -s -f -u $apiUser:"$apiPass" -H "Accept: application/xml" $jssURL/JSSResource/computers/udid/$udid/subset/extension_attributes)
+trimmedResult=$( echo $fullResult | grep '<name>$extAttName</name><type>String</type><multi_value>false</multi_value><value>' )
+echo "$trimmedResult"
+newline=$'\n'
+trimmed2=$(echo "${trimmedResult//'$extAttName -Local'/$newline}")
+echo "trimmed again"
+echo "$trimmed2"
+trimmed3=$(echo "${trimmed2//'$extAttName'/'${newline}$RescuePassword'}" | grep "$extAttName" | awk -F'<value>|</value>' '{print $2}' )
+echo " "
+echo "trimmed again"
+echo "$trimmed3"
+echo " "
+checkPass=$(echo "$trimmed3" | tr -d '\040\011\012\015')
+echo "$checkPass"
+echo "getPass"
+echo "$getPass"
+
+if [[ "$checkPass" == "$getPass" ]] ; then
+	echo "password uploaded successfully"
+	rm -f "$passLocation"
+else
+	echo "password failed to upload to jamf"
+	echo "trying again."
+	setEAStatus
+fi
+
+}
+
 uploadCheck
 
