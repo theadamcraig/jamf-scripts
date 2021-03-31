@@ -28,7 +28,7 @@ fi
 loggedInUID=$(id -u "$loggedInUser")
 
 
-if [[ -z "$adminName" ]] || [[ -z "$adminPass" ]] ; thne
+if [[ -z "$adminName" ]] || [[ -z "$adminPass" ]] ; then
 	echo "adminName or adminPass variables are missing"
 	exit 1
 fi
