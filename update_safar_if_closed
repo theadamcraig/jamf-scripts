@@ -1,0 +1,31 @@
+#!/bin/bash
+
+#writted by theadamcraig
+
+
+
+appName="Safari Web Content"
+
+function updateSafari () {
+	updateName=$(softwareupdate -l | grep "Safari" | grep "Label" | awk '{ print $3 }')
+	if [ -z "$updateName" ] ; then 
+		echo "update not found."
+		echo "listing software updates to make sure there is not an error:"
+		echo $( softwareupdate -l )
+		exit 1
+	fi
+	softwareUpdate -i "$updateName"
+	sleep 5
+	exit 0
+}
+
+appRunning=`ps aux | grep -i "$appName" | grep -v "grep"`
+echo "Checking if $appName is running"
+echo "$appRunning"
+
+if [ -z "$appRunning" ] ; then
+	echo "update Safari"
+	updateSafari
+else
+	echo "$appName is open. skipping Update"
+fi
