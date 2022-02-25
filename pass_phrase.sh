@@ -19,7 +19,7 @@
 
 debug=0
 # do you want to capitalize the first letter of each word
-capitals="yes"
+capitals="no"
 ## So we could easily change the divider between space - or none.
 div=""
 
