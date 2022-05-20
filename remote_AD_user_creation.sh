@@ -42,9 +42,9 @@ Log "---------------------------------"
 DisplayDialog(){
 	local dialogText="$1"
 	echo "$dialogText"
-	Log "Display Dialog: $dialogText"
-	cmd="Tell app \"System Events\" to display dialog \"$dialogText\""
-	/usr/bin/osascript -e "$cmd"
+	#echo "Display Dialog: $dialogText"
+	cmd="display dialog \"$dialogText\" buttons {\"Continue\"} default button 1 giving up after 180"
+	/bin/launchctl asuser "$loggedInUID" sudo -iu "$loggedInUser" /usr/bin/osascript -e "$cmd"
 }
 
 ## verify that adminuser and pass variables are both passed to the user
