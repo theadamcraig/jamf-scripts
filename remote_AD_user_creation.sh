@@ -84,7 +84,7 @@ fi
 userToAdd=$(/usr/bin/osascript<<END
 tell application "System Events"
 activate
-set the answer to text returned of (display dialog "Enter your CoverMyMeds account Username:" default answer "" buttons {"Continue"} default button 1)
+set the answer to text returned of (display dialog "Enter your User account Username:" default answer "" buttons {"Continue"} default button 1)
 end tell
 END
 )
@@ -98,7 +98,7 @@ fi
 userPass=$(/usr/bin/osascript<<END
 tell application "System Events"
 activate
-set the answer to text returned of (display dialog "Enter your CoverMyMeds account Password:" default answer "" with hidden answer buttons {"Continue"} default button 1)
+set the answer to text returned of (display dialog "Enter your User account Password:" default answer "" with hidden answer buttons {"Continue"} default button 1)
 end tell
 END
 )
@@ -150,7 +150,7 @@ fi
 done
 
 if [[ -z "$userCheck" ]] ; then
-	DisplayDialog "AD User failed to add. \nVerify GlobalProtect is Connected. \nRecommend restarting the computer and trying this install again. \nIf issues continue run 'Rebind to Domain' from Self Service and then try install again."
+	DisplayDialog "AD User failed to add. \nVerify VPN has a network Connected. \nRecommend restarting the computer and trying this install again. \nIf issues continue run 'Rebind to Domain' from Self Service and then try install again."
 	exit 1
 fi
 
