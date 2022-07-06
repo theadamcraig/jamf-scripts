@@ -4,9 +4,9 @@ These are instructions on how to use the SentinelOne post install script with Ja
 
 the advantage of this workflow is that you can use one policy to install and update SentinelOne
 
-## 1. Upload the SentinelAgent_macos_vXX_XX_X_XXXX_.pkg as downloaded from SentinelOne to Jamf
+### 1. Upload the SentinelAgent_macos_vXX_XX_X_XXXX_.pkg as downloaded from SentinelOne to Jamf
 
-## 2. Add the script to Jamf. 
+### 2. Add the script to Jamf. 
 Change the line where it says "YOURREGISTRATIONTOKENHERE" to your sentinelone token.
 
 ![SentinelOne Token](https://github.com/theadamcraig/jamf-scripts/blob/master/SentinelOne/SentinelOne_registration_token.png)
