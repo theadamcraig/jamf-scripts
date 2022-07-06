@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #################################################
-# RESCUE ACCOUNT MANAGEMENT for MAC
+# RESCUE ACCOUNT SETUP
 #################################################
 
 ## https://github.com/theadamcraig/jamf-scripts/
