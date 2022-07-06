@@ -1,6 +1,6 @@
 #! /bin/bash
 
-## script is written by the adamcraig and sourced from https://github.com/theadamcraig/jamf-scripts/sentineone_postinstall.sh
+## script is written by the adamcraig and sourced from https://github.com/theadamcraig/jamf-scripts/tree/master/SentinelOne
 
 
 # Unlike other sentinel installs this script will either Install on a new computer OR upgrade if sentinel is already installed. 
@@ -8,9 +8,8 @@
 
 ## MAKE SURE TO ADD IN YOUR TOKEN TO REPLACE "YOURTOKENGOESHERE"
 
-## it's kinda weird because I didn't want two versions. Originally I was packaging up the sentinelagent installer and putting it in /tmp/
-## then I just decided to cache it so I didn't need to repackage it, so this script will check both /tmp and the waiting room.
-
+##Originally I was packaging up the SentinelAgent_macos installer and putting it in /tmp/
+## then I changed to cache it so I didn't need to repackage it, so this script will check both /tmp and the waiting room.
 
 PKG_NAME="$4"
 ## ex: SentinelAgent_macos_v3_0_4_2657.pkg
@@ -25,7 +24,6 @@ if [[ "$PKG_NAME" == "" ]]; then
     /bin/echo "Error: The parameter 'SentinelOne .pkg Name' is blank. Please specify a value." 
     exit 1 
 fi
-
 
 REGISTRATION_TOKEN="/tmp/com.sentinelone.registration-token"
 S1_BINARY="/Library/Sentinel/sentinel-agent.bundle/Contents/MacOS/sentinelctl"
@@ -72,8 +70,8 @@ chmod -R 777 "${INSTALL_DIRECTORY}com.sentinelone.registration-token"
     rm "${INSTALL_DIRECTORY}com.sentinelone.registration-token"
 fi
 
-
-#Clean up the installer
-rm "${INSTALL_PKG}"
+#Clean up the installer and the jamf cache file
+rm -f "${INSTALL_PKG}"
+rm -f "${INSTALL_PKG}"*
 
 exit 0
