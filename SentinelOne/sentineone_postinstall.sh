@@ -72,6 +72,7 @@ fi
 
 #Clean up the installer and the jamf cache file
 rm -f "${INSTALL_PKG}"
+# also remove the cache.xml file
 rm -f "${INSTALL_PKG}"*
 
 exit 0
