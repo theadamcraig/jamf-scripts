@@ -25,7 +25,7 @@ else
 	exit 0
 fi
 
-jssURL="https://covermymeds.jamfcloud.com"
+jssURL="https://domain.jamfcloud.com"
 udid=$(/usr/sbin/system_profiler SPHardwareDataType | /usr/bin/awk '/Hardware UUID:/ { print $3 }')
 ## extAttName also needs to be changed in the curl command in setEAStatus function.
 extAttName="\"RescuePassword\""
