@@ -5,8 +5,7 @@ The goal of a rescue account is to have a local account on the computer that you
 Once you give a user the rescue password you can reset it just by deleting the password from jamf.
 ![RescueAccount_EA_ComputerRecord](https://github.com/theadamcraig/jamf-scripts/blob/master/rescue_account/screenshots/RescueAccount_EA_ComputerRecord.png)
 
-
-These are instructions on how to use the setup these rescue account policies with Jamf
+##These are instructions on how to setup these rescue account policies with Jamf
 
 ### 1. Generate adjective.txt nount.txt & verb.txt files
 I'm not providing these files, there are a lot of lists you can find online, I also recommend cleaning them of NSFW words to prevent having to awkwardly tell someone a very dirty sounding password.
@@ -96,8 +95,8 @@ This means that after you are done assisting a user with the Rescue account you 
 
 Create a new policy with the Rescue_Account_Cleanup.sh script
 
-$4 is your API Username
-$5 is your API Users Password
+- $4 is your API Username
+- $5 is your API Users Password
 
 ![RescueAccount_Cleanup](https://github.com/theadamcraig/jamf-scripts/blob/master/rescue_account/screenshots/RescueAccount_Cleanup.png)
 
@@ -118,5 +117,4 @@ add the account to Accounts Prohibited from Network Account Connection
 
 and Users with Local Authentication Privileges
 ![JamfConnect_userswithlocalauth](https://github.com/theadamcraig/jamf-scripts/blob/master/rescue_account/screenshots/JamfConnect_userswithlocalauth.png)
-
 
