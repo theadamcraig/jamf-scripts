@@ -3,8 +3,6 @@
 # written by theadamcraig
 # https://github.com/theadamcraig/jamf-scripts/blob/master/update_safari_if_closed
 
-
-
 appName="Safari Web Content"
 
 function updateSafari () {
@@ -30,3 +28,5 @@ if [ -z "$appRunning" ] ; then
 else
 	echo "$appName is open. skipping Update"
 fi
+
+exit 0
