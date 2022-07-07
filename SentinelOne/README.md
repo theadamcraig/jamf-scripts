@@ -9,7 +9,7 @@ the advantage of this workflow is that you can use one policy to install and upd
 ### 2. Add the script to Jamf. 
 Change the line where it says "YOURREGISTRATIONTOKENHERE" to your sentinelone token.
 
-![SentinelOne Token](https://github.com/theadamcraig/jamf-scripts/blob/master/SentinelOne/SentinelOne_registration_token.png)
+![SentinelOne Token](https://github.com/theadamcraig/jamf-scripts/blob/master/SentinelOne/screenshots/SentinelOne_registration_token.png)
 
 ### 3. Create a new policy with whatever Scope and Trigger desired.
 
@@ -17,7 +17,7 @@ Change the line where it says "YOURREGISTRATIONTOKENHERE" to your sentinelone to
 
 Make sure to set the Action to Cache
 
-![SentinelOne Package Cache](https://github.com/theadamcraig/jamf-scripts/blob/master/SentinelOne/SentinelOne_Policy_Packages.png)
+![SentinelOne Package Cache](https://github.com/theadamcraig/jamf-scripts/blob/master/SentinelOne/screenshots/SentinelOne_Policy_Packages.png)
 
 ### 5. Add the sentinelone_postinstall.sh script to the policy
 
@@ -25,7 +25,7 @@ set the Priority to After
 
 As variable $4 add the full name of the .pkg that is being cached.
 
-![SentinelOne Script](https://github.com/theadamcraig/jamf-scripts/blob/master/SentinelOne/SentinelOne_Policy_Scripts.png)
+![SentinelOne Script](https://github.com/theadamcraig/jamf-scripts/blob/master/SentinelOne/screenshots/SentinelOne_Policy_Scripts.png)
 
 ### 6. Save the policy
 
