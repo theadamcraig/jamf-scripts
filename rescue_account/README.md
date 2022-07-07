@@ -66,13 +66,13 @@ Rescue Account Installed and Not Encrypted
 
 Scope this to all the computers that need the Rescue Account, and have the Local Admin Account Filevault Enabled.
 
-Exclude the *Rescue Account Installed* Smart Group.
+Exclude the **Rescue Account Installed** Smart Group.
 
-$4 is your API Username
-$5 is your API Users Password
-$6 is the rescue account username (Make this match the smartgroups)
-$7 is your local admin username
-$8 is your local admin password
+- $4 is your API Username
+- $5 is your API Users Password
+- $6 is the rescue account username (Make this match the smartgroups)
+- $7 is your local admin username
+- $8 is your local admin password
 
 ![CreateRescueAccount](https://github.com/theadamcraig/jamf-scripts/blob/master/rescue_account/screenshots/CreateRescueAccount.png)
 
@@ -84,7 +84,7 @@ If the API update fails it will be saved locally and read by a separate Extensio
 
 Clone the previous policy
 
-Change the scope to be the *Rescue Account Password Needs Reset* & *Rescue Account Installed and Not Encrypted* smart groups. Remove the *Rescue Account Installed* group from the exclusions
+Change the scope to be the **Rescue Account Password Needs Reset** & **Rescue Account Installed and Not Encrypted** smart groups. Remove the **Rescue Account Installed** group from the exclusions
 
 ![ChangeRescuePassword_scope](https://github.com/theadamcraig/jamf-scripts/blob/master/rescue_account/screenshots/ChangeRescuePassword_scope.png)
 
@@ -101,7 +101,7 @@ $5 is your API Users Password
 
 ![RescueAccount_Cleanup](https://github.com/theadamcraig/jamf-scripts/blob/master/rescue_account/screenshots/RescueAccount_Cleanup.png)
 
-Scope this policy to the *Rescue Account needs cleaned* smart group.
+Scope this policy to the **Rescue Account needs cleaned** smart group.
 
 This policy will get the local variable and upload it again if the password fails to upload when the account is created or the password is changed.
 
