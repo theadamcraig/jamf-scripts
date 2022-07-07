@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-## leaing this here for reference. I no longer use this file due to Python not being included with Mac OS starting with 12.3
+## leaving this here for reference. I no longer use this file due to Python not being included with Mac OS starting with 12.3
 
 ### I DID NOT WRITE THIS FILE! SEE LICENSE! I AM PUTTING HERE SO IT CAN BE REFERENCE TO OTHER USERS.
 

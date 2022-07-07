@@ -1,5 +1,9 @@
 #!/bin/bash
 
+## This script isn't really useful anymore.
+## Once computers stopped being bound to AD this stopped being a problem. There are a bunch of things I could do better now if I was to still use a process like this.
+## I also found that even though it made perfect sense to me, helpdesk team members never got very comfortable with this process
+
 ##UPDATE KEYCHAIN PASSWORD
 ## Written by adamcraig https://github.com/theadamcraig/jamf-scripts
 ## Last updated 4/02/2020

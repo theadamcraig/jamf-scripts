@@ -1,5 +1,9 @@
 #!/bin/sh
 
+## I stopped using this. Installomator does it way better
+
+# https://github.com/Installomator/Installomator
+
 #based on a script that installs the latest version of Chrome
 
 

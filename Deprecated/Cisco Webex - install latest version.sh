@@ -1,4 +1,9 @@
 #!/bin/bash
+
+## I stopped using this. Installomator does it way better
+
+# https://github.com/Installomator/Installomator
+
 # Based on a script that installs the latest version of chrome.
 
 loggedInUser=$( echo "show State:/Users/ConsoleUser" | scutil | awk '/Name :/ && ! /loginwindow/ { print $3 }' )
