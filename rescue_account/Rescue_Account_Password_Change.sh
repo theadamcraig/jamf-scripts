@@ -108,6 +108,31 @@ else
 	adminPass="$8"
 fi
 
+## Request Auth Token
+authToken=$( /usr/bin/curl \
+--request POST \
+--silent \
+--url "$jssURL/api/v1/auth/token" \
+--user "$apiUser:$apiPass" )
+
+echo "$authToken"
+
+# parse auth token
+token=$( /usr/bin/plutil \
+-extract token raw - <<< "$authToken" )
+
+tokenExpiration=$( /usr/bin/plutil \
+-extract expires raw - <<< "$authToken" )
+
+localTokenExpirationEpoch=$( TZ=GMT /bin/date -j \
+-f "%Y-%m-%dT%T" "$tokenExpiration" \
++"%s" 2> /dev/null )
+
+echo Token: "$token"
+echo Expiration: "$tokenExpiration"
+echo Expiration epoch: "$localTokenExpirationEpoch"
+
+
 #####################################################
 #####################################################
 ## Functions that the script will use
@@ -194,7 +219,17 @@ setEAStatus() {
 	fullURL="$jssURL/JSSResource/computers/udid/$udid/subset/extension_attributes"
 	echo "${fullURL}"
 
-	apiPost=$(curl -s -f -u "$apiUser":"$apiPass" -X "PUT" "${fullURL}" -H "Content-Type: application/xml" -H "Accept: application/xml" -d "${apiData}" 2>&1 )
+	# apiPost=$(curl -s -f -u "$apiUser":"$apiPass" -X "PUT" "${fullURL}" -H "Content-Type: application/xml" -H "Accept: application/xml" -d "${apiData}" 2>&1 )
+
+    apiPost=$( /usr/bin/curl \
+    --header "Content-Type: text/xml" \
+    --request PUT \
+    --data "$apiData" \
+    --silent \
+    --url "$fullURL" \
+    --header "Authorization: Bearer $token" \
+    2>&1 \
+    )
 
 	/bin/echo "${apiPost}"
 
@@ -202,7 +237,13 @@ setEAStatus() {
 
 uploadCheck() {
 	echo "Checking Password"
-	checkPass=$(curl -s -f -u "$apiUser":"$apiPass" -H "Accept: application/xml" $jssURL/JSSResource/computers/udid/"$udid"/subset/extension_attributes | xpath "//extension_attribute[name=$extAttName]" 2>&1 | awk -F'<value>|</value>' '{print $2}')
+	# checkPass=$(curl -s -f -u "$apiUser":"$apiPass" -H "Accept: application/xml" $jssURL/JSSResource/computers/udid/"$udid"/subset/extension_attributes | xpath "//extension_attribute[name=$extAttName]" 2>&1 | awk -F'<value>|</value>' '{print $2}')
+    checkPass=$( /usr/bin/curl \
+    --header "Accept: text/xml" \
+    --request GET \
+    --silent \
+    --url "$jssURL/JSSResource/computers/udid/${udid}/subset/extension_attributes" \
+    --header "Authorization: Bearer $token" | xpath "//extension_attribute[name=$extAttName]" 2>&1 | awk -F'<value>|</value>' '{print $2}' )
 	checkPass=$(echo "$checkPass" | tr -d '\040\011\012\015')
 	echo "$checkPass"
 	echo "rescuePass"
@@ -285,6 +326,26 @@ echo '<?xml version="1.0" encoding="UTF-8"?>
 	rm -r /tmp/fvenable.plist
 }
 
+expireApiToken() {
+
+	# expire auth token
+	/usr/bin/curl \
+	--header "Authorization: Bearer $token" \
+	--request POST \
+	--silent \
+	--url "$jssURL/api/v1/auth/invalidate-token"
+
+	# verify auth token is valid
+	checkToken=$( /usr/bin/curl \
+	--header "Authorization: Bearer $token" \
+	--silent \
+	--url "$jssURL/api/v1/auth" \
+	--write-out "%{http_code}" )
+
+	tokenStatus=${checkToken: -3}
+	# Token status should be 401
+	echo "Token status: $tokenStatus"
+	}
 
 #############################################
 #############################################
@@ -345,9 +406,11 @@ if [[ "$rescueIsAdmin" == "true" ]] ; then
 	rescueToken=$(secureTokenUserCheck "$rescueUser" )
 	if [[ "$rescueIsAdmin" == "true" ]] ; then 
 		echo "$rescueUser failed to demote"
+		expireApiToken
 		exit 1
 	fi
 fi
+
 
 ## FIX rescue INCORRECT PASSWORD
 if [[ "$rescuePassCorrect" == "false" ]] ; then
@@ -359,6 +422,7 @@ if [[ "$rescuePassCorrect" == "false" ]] ; then
 	rescueToken=$(secureTokenUserCheck "$rescueUser" )
 	if [[ "$rescuePassCorrect" == "false" ]] ; then 
 		echo "$rescueUser failed to update password"
+        expireApiToken
 		exit 1
 	fi
 fi
@@ -371,6 +435,7 @@ if [[ "$rescueFV" == "false" ]] ; then
 	rescueToken=$(secureTokenUserCheck "$rescueUser" )
 	if [[ "$rescueFV" == "false" ]] ; then 
 		echo "$rescueUser failed to update filevault"
+        expireApiToken
 		exit 1
 	fi
 fi
@@ -382,6 +447,7 @@ if [[ "$rescueToken" == false ]] ; then
 	rescueToken=$(secureTokenUserCheck "$rescueUser" )
 	if [[ "$rescueToken" == "false" ]] ; then 
 		echo "$rescueUser failed to update secure token"
+        expireApiToken
 		exit 1
 	fi
 fi
@@ -402,5 +468,7 @@ uploadCheck
 echo " "
 echo "Updating apfs preboot"
 diskutil apfs updatePreboot / >> /dev/null 2>&1 
+
+expireApiToken
 
 exit 0
